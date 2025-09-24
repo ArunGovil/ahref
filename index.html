@@ -1,18 +1,47 @@
-<a href="https://www.apple.com/legal/zip/2022-Supplemental-Data-File.zip"
-  >Simple Download</a
->
-<br />
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PWA S3 Download Test</title>
+  </head>
+  <body style="font-family: sans-serif; padding: 2rem">
+    <h1>Download</h1>
 
-<a
-  href="https://www.apple.com/legal/zip/2022-Supplemental-Data-File.zip"
-  target="_self"
-  >Self Download</a
->
-<br />
+    <button id="downloadBtn">Download CSV from S3</button>
 
-<a
-  href="https://www.apple.com/legal/zip/2022-Supplemental-Data-File.zip"
-  rel="noopener noreferrer"
-  target="_self"
-  >Noopener Download</a
->
+    <script>
+      async function downloadFromSignedUrl() {
+        const fileUrl =
+          "https://unifize-jq1gj9dpvw.s3.us-east-2.amazonaws.com/413/6bd5a0d0-bf25-49c1-8b0f-ffacc0a77576?versionId=e5pExrAwV4bm0Bxg6qIZ5sddUP8papta&response-content-disposition=attachment%3B%20filename%3D%22Linked%2520template%2520%25286%2529.csv%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250924T113127Z&X-Amz-SignedHeaders=host&X-Amz-Expires=3600&X-Amz-Credential=AKIARXEUVTHULHTPBBVW%2F20250924%2Fus-east-2%2Fs3%2Faws4_request&X-Amz-Signature=b28bef520a26b22db485ea1a4cede83fa100df1942abc3383d7759a954a4d156";
+
+        try {
+          // Fetch the S3 object as a Blob
+          const res = await fetch(fileUrl, { credentials: "omit" });
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          const blob = await res.blob();
+
+          // Suggested file name (can be dynamic)
+          const defaultName = "Linked template (6).csv";
+
+          // Create a temporary object URL and trigger download
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = defaultName;
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          setTimeout(() => URL.revokeObjectURL(url), 1000);
+        } catch (err) {
+          console.error("Download failed:", err);
+          alert("Unable to download file.");
+        }
+      }
+
+      document
+        .getElementById("downloadBtn")
+        .addEventListener("click", downloadFromSignedUrl);
+    </script>
+  </body>
+</html>
