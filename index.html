@@ -24,6 +24,9 @@
       target="_blank"
       >Blank Download</a
     >
+    <br />
+
+    <button id="downloadBtn">Download CSV from S3</button>
 
     <script>
       // Register the service worker
@@ -33,6 +36,41 @@
           .then(() => console.log("Service Worker registered"))
           .catch((err) => console.error("Service Worker failed:", err));
       }
+
+      async function downloadFileAsync() {
+        const fileUrl =
+          "https://unifize-jq1gj9dpvw.s3.us-east-2.amazonaws.com/413/6bd5a0d0-bf25-49c1-8b0f-ffacc0a77576?versionId=e5pExrAwV4bm0Bxg6qIZ5sddUP8papta&response-content-disposition=attachment%3B%20filename%3D%22Linked%2520template%2520%25286%2529.csv%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250924T113127Z&X-Amz-SignedHeaders=host&X-Amz-Expires=3600&X-Amz-Credential=AKIARXEUVTHULHTPBBVW%2F20250924%2Fus-east-2%2Fs3%2Faws4_request&X-Amz-Signature=b28bef520a26b22db485ea1a4cede83fa100df1942abc3383d7759a954a4d156";
+
+        const response = await fetch(fileUrl);
+        if (response.status > 299)
+          window.location =
+            window.location.origin + "/statuscode/" + response.status;
+
+        let filename = "downloaded-file";
+        const contentDisposition = response.headers.get("Content-Disposition");
+        if (contentDisposition) {
+          const filenameMatch =
+            contentDisposition.match(/filename\*=(?:UTF-8'')?(.+?)(?:;|$)/) ||
+            contentDisposition.match(/filename="(.+?)"/);
+
+          if (filenameMatch && filenameMatch.length > 1) {
+            filename = decodeURIComponent(filenameMatch[1].replace(/"/g, ""));
+          }
+        }
+
+        const blob = await response.blob();
+        const downloadUrl = URL.createObjectURL(blob);
+        const anchorElement = document.createElement("a");
+        anchorElement.href = downloadUrl;
+        anchorElement.download = filename ?? "";
+        anchorElement.click();
+        anchorElement.remove();
+        URL.revokeObjectURL(downloadUrl);
+      }
+
+      document
+        .getElementById("downloadBtn")
+        .addEventListener("click", downloadFileAsync);
     </script>
   </body>
 </html>
