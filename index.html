@@ -50,6 +50,10 @@
     <br />
 
     <button id="updateBtn">Update PWA</button>
+    <br />
+    <br />
+
+    <button id="reloadBtn">Reload App</button>
 
     <script>
       // Register the service worker
@@ -91,9 +95,35 @@
         URL.revokeObjectURL(downloadUrl);
       }
 
+      function updateApp() {
+        console.log("Updating app..");
+        navigator.serviceWorker.getRegistration().then((reg) => {
+          if (!reg) return;
+
+          // Force service worker to fetch latest SW
+          reg.update().then(() => {
+            if (reg.waiting) {
+              // Tell waiting SW to skip waiting and take control
+              reg.waiting.postMessage({ type: "UPDATE_APP" });
+            }
+          });
+        });
+      }
+
+      function reloadApp() {
+        console.log("Reloading app...");
+        window.location.reload();
+      }
+
       document
         .getElementById("downloadBtn")
         .addEventListener("click", downloadFileAsync);
+
+      document.getElementById("updateBtn").addEventListener("click", updateApp);
+
+      document.getElementById("reloadBtn").addEventListener("click", reloadApp);
+
+      navigator.serviceWorker.addEventListener("controllerchange", reloadApp);
     </script>
   </body>
 </html>
