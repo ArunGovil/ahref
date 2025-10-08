@@ -8,7 +8,7 @@
     <title>PWA href</title>
   </head>
   <body style="font-family: sans-serif; padding: 2rem">
-    <h1>PWA V-1.6</h1>
+    <h1>PWA V-1.7</h1>
 
     <a
       href="https://www.apple.com/legal/zip/2022-Supplemental-Data-File.zip"
@@ -52,8 +52,6 @@
     <button id="updateBtn">Update PWA</button>
     <br />
     <br />
-
-    <button id="reloadBtn">Reload App</button>
 
     <script>
       // Register the service worker
@@ -120,8 +118,6 @@
         .addEventListener("click", downloadFileAsync);
 
       document.getElementById("updateBtn").addEventListener("click", updateApp);
-
-      document.getElementById("reloadBtn").addEventListener("click", reloadApp);
 
       navigator.serviceWorker.addEventListener("controllerchange", reloadApp);
     </script>
